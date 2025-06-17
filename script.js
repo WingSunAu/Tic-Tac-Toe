@@ -1,33 +1,4 @@
-function createGame(name1, color1, name2, color2) {
-    let player1 = createPlayer(name1, color1, 1);
-    let player2 = createPlayer(name2, color2, 2);
-    let board = createGameBoard();
-    let turn = 1;
-    const getPlayer1 = () => player1;
-    const getPlayer2 = () => player2;
-    const getBoard = () => board;
-    const log = () => console.log(board.getGrid());
-    return { getPlayer1, getPlayer2, getBoard, log };
-}
-
-function createGameBoard() {
-    const grid = [
-        ["", "", "",],
-        ["", "", "",],
-        ["", "", "",],
-    ]
-    const getGrid = () => grid;
-    const markGrid = (x, y, player) => {
-        if (player == 1) {
-            grid[y][x] = "X";
-        } else {
-            grid[y][x] = "O";
-        }
-        return player;
-    }
-    return { getGrid, markGrid };
-}
-
+// make setters
 function createPlayer(name, color, order) {
     this.name = name;
     this.color = color;
@@ -37,7 +8,98 @@ function createPlayer(name, color, order) {
     const getColor = () => color;
     const getOrder = () => order;
     const getScore = () => score;
+    const setName = (name) => this.name = name;
+    const setColor = (color) => this.color = color;
     const upScore = () => score++;
-    return { getName, getColor, getOrder, getScore, upScore };
+    return { getName, getColor, getOrder, getScore, upScore, setName, setColor };
 }
-let a = createGame("john", "green", "blake", "white");
+
+game = (() => {
+    let player1 = createPlayer("default1", "red", 1);
+    let player2 = createPlayer("default2", "blue", 2);
+    let board = (() => {
+        const grid = [
+            ["", "", "",],
+            ["", "", "",],
+            ["", "", "",],
+        ]
+        let whoseTurn = 1;
+        let turnCount = 0;
+        let playing = true;
+        //0 = tie, 1 = 1 win, 2 = 2 win
+        let win = 0;
+        const getGrid = () => grid;
+        const markGrid = (x, y) => {
+            if (playing) {
+                if (x < 3 && y < 3 && grid[y][x] == "") {
+                    turnCount++;
+                    if (whoseTurn == 1) {
+                        grid[y][x] = "X";
+                        checkGrid(x, y, whoseTurn);
+                        whoseTurn = 2;
+                    } else {
+                        grid[y][x] = "O";
+                        checkGrid(x, y, whoseTurn);
+                        whoseTurn = 1;
+                    }
+                    log();
+                    return;
+                } else {
+                    log();
+                    return "invalid space, make a different move";
+                }
+            }
+            return "game over, start a new game!"
+        }
+        const checkGrid = (y, x, player) => {
+            if (turnCount == 9) {
+                playing = false;
+                win = 0;
+                return "tie!";
+            }
+            let mark = "";
+            let nextTurn = 0;
+            if (player == 1) {
+                mark = "X";
+                nextTurn = 2;
+            } else {
+                mark = "O";
+                nextTurn = 1;
+            }
+            if (grid[1][1] == mark) {
+                // check in order, diag, anti diag, row, col
+                if (grid[0][0] == mark && grid[2][2] == mark ||
+                    grid[2][0] == mark && grid[0][2] == mark ||
+                    grid[0][1] == mark && grid[2][1] == mark ||
+                    grid[1][0] == mark && grid[1][2] == mark
+                ) {
+                    win = player;
+                }
+            }
+            // check left col, top and bottom rows
+            else if (grid[0][0] == mark && (grid[1][0] == mark && grid[2][0] == mark ||
+                grid[0][1] == mark && grid[0][2] == mark) ||
+                grid[2][0] == mark && grid[2][1] == mark && grid[2][2] == mark
+            ) {
+                win = player;
+            }
+            //check right col
+            else if (grid[0][2] == mark && grid[1][2] == mark && grid[2][2] == mark) {
+                win = player;
+            }
+            if (win > 0) {
+                console.log("woah");
+                playing = false;
+                return "player " + player + " won!"
+            }
+            return "player" + nextTurn + "'s turn";
+        }
+        return { getGrid, markGrid };
+    })();
+    const getPlayer1 = () => player1;
+    const getPlayer2 = () => player2;
+    const getBoard = () => board;
+    const log = () => console.log(board.getGrid());
+    return { getPlayer1, getPlayer2, getBoard };
+})();
+
