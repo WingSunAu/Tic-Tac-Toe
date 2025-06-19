@@ -35,10 +35,12 @@ game = (() => {
                     turnCount++;
                     if (whoseTurn == 1) {
                         grid[y][x] = "X";
+                        document.getElementById(x + "," + y).textContent = grid[y][x];
                         checkGrid(x, y, whoseTurn);
                         whoseTurn = 2;
                     } else {
                         grid[y][x] = "O";
+                        document.getElementById(x + "," + y).textContent = grid[y][x];
                         checkGrid(x, y, whoseTurn);
                         whoseTurn = 1;
                     }
@@ -88,7 +90,6 @@ game = (() => {
                 win = player;
             }
             if (win > 0) {
-                console.log("woah");
                 playing = false;
                 return "player " + player + " won!"
             }
@@ -103,3 +104,30 @@ game = (() => {
     return { getPlayer1, getPlayer2, getBoard };
 })();
 
+display = (() => {
+    const init = () => {
+        grid = document.getElementById("grid");
+        let xCount = 0;
+        let yCount = 0;
+        for (let i = 1; i < 10; i++) {
+            let box = document.createElement("button");
+            box.classList.add("box");
+            box.id = "" + i;
+            // assign x y values to according box
+            box.id = xCount + "," + yCount;
+            let x = xCount;
+            let y = yCount;
+            box.addEventListener('click', () => {
+                game.getBoard().markGrid(x, y);
+            });
+            xCount++;
+            if (xCount > 2) {
+                xCount = 0;
+                yCount++;
+            }
+            grid.appendChild(box);
+        }
+    }
+    return { init }
+})();
+display.init();
