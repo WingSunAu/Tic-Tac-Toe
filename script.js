@@ -36,12 +36,12 @@ game = (() => {
                     if (whoseTurn == 1) {
                         grid[y][x] = "X";
                         document.getElementById(x + "," + y).textContent = grid[y][x];
-                        checkGrid(x, y, whoseTurn);
+                        checkGrid(whoseTurn);
                         whoseTurn = 2;
                     } else {
                         grid[y][x] = "O";
                         document.getElementById(x + "," + y).textContent = grid[y][x];
-                        checkGrid(x, y, whoseTurn);
+                        checkGrid(whoseTurn);
                         whoseTurn = 1;
                     }
                     log();
@@ -53,7 +53,7 @@ game = (() => {
             }
             return "game over, start a new game!"
         }
-        const checkGrid = (y, x, player) => {
+        const checkGrid = (player) => {
             if (turnCount == 9) {
                 playing = false;
                 win = 0;
@@ -95,13 +95,31 @@ game = (() => {
             }
             return "player" + nextTurn + "'s turn";
         }
-        return { getGrid, markGrid };
+        const reset = () => {
+            for (let i = 0; i < grid.length; i++) {
+                for (let j = 0; j < grid[i].length; j++) {
+                    grid[i][j] = "";
+                }
+            }
+            whoseTurn = 1;
+            turnCount = 0;
+            playing = true;
+            win = 0;
+        }
+        return { getGrid, markGrid, reset };
     })();
+    const reset = () => {
+        board.reset();
+        player1.setName("default1");
+        player2.setName("default2");
+        player1.setColor("red");
+        player2.setColor("blue");
+    }
     const getPlayer1 = () => player1;
     const getPlayer2 = () => player2;
     const getBoard = () => board;
     const log = () => console.log(board.getGrid());
-    return { getPlayer1, getPlayer2, getBoard };
+    return { getPlayer1, getPlayer2, getBoard, reset };
 })();
 
 display = (() => {
@@ -109,6 +127,7 @@ display = (() => {
         grid = document.getElementById("grid");
         let xCount = 0;
         let yCount = 0;
+        let title = ["T", "I", "C", "T", "A", "C", "T", "O", "E"];
         for (let i = 1; i < 10; i++) {
             let box = document.createElement("button");
             box.classList.add("box");
@@ -125,9 +144,18 @@ display = (() => {
                 xCount = 0;
                 yCount++;
             }
+            box.textContent = title[i - 1];
             grid.appendChild(box);
         }
     }
-    return { init }
+    const clear = () => {
+        set = document.getElementsByClassName(".box");
+        for (let box of set) {
+            box.textContent = "";
+        }
+        game.reset();
+    }
+    return { init, clear }
 })();
-display.init();
+document.getElementById("start").addEventListener('click', () => { display.clear(); });
+display.init(true);
