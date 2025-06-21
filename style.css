@@ -109,6 +109,7 @@ section {
 
 body {
     line-height: 1;
+    background-color: rgb(50, 50, 100);
 }
 
 ol,
@@ -165,9 +166,15 @@ body {
     font-size: 10rem;
 }
 
-#start {
+#start,
+#new-players {
     width: 300px;
     margin: auto;
+}
+
+#warning {
+    margin: auto;
+    text-align: center;
 }
 
 .box:hover {
