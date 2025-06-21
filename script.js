@@ -125,6 +125,7 @@ game = (() => {
 display = (() => {
     const init = () => {
         grid = document.getElementById("grid");
+        grid.innerHTML = '';
         let xCount = 0;
         let yCount = 0;
         let title = ["T", "I", "C", "T", "A", "C", "T", "O", "E"];
@@ -147,9 +148,10 @@ display = (() => {
             box.textContent = title[i - 1];
             grid.appendChild(box);
         }
+
     }
     const clear = () => {
-        set = document.getElementsByClassName(".box");
+        set = document.getElementsByClassName("box");
         for (let box of set) {
             box.textContent = "";
         }
