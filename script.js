@@ -15,8 +15,8 @@ function createPlayer(name, color, order) {
 }
 
 game = (() => {
-    let player1 = createPlayer("default1", "red", 1);
-    let player2 = createPlayer("default2", "blue", 2);
+    let player1 = createPlayer("player1", "red", 1);
+    let player2 = createPlayer("player2", "blue", 2);
     let board = (() => {
         const grid = [
             ["", "", "",],
@@ -25,10 +25,11 @@ game = (() => {
         ]
         let whoseTurn = 1;
         let turnCount = 0;
-        let playing = true;
+        let playing = false;
         //0 = tie, 1 = 1 win, 2 = 2 win
         let win = 0;
         const getGrid = () => grid;
+        const setPlaying = () => { playing = false };
         const markGrid = (x, y) => {
             if (playing) {
                 if (x < 3 && y < 3 && grid[y][x] == "") {
@@ -36,12 +37,19 @@ game = (() => {
                     if (whoseTurn == 1) {
                         grid[y][x] = "X";
                         document.getElementById(x + "," + y).textContent = grid[y][x];
-                        checkGrid(whoseTurn);
+                        document.getElementById("title").textContent = player2.getName() + "'s turn";
+                        if (checkGrid(whoseTurn, player1.getName()) != "") {
+                            document.getElementById("title").textContent = checkGrid(whoseTurn, player1.getName());
+                        }
                         whoseTurn = 2;
                     } else {
                         grid[y][x] = "O";
                         document.getElementById(x + "," + y).textContent = grid[y][x];
-                        checkGrid(whoseTurn);
+
+                        document.getElementById("title").textContent = player1.getName() + "'s turn";
+                        if (checkGrid(whoseTurn, player1.getName()) != "") {
+                            document.getElementById("title").textContent = checkGrid(whoseTurn, player2.getName());
+                        }
                         whoseTurn = 1;
                     }
                     log();
@@ -51,22 +59,19 @@ game = (() => {
                     return "invalid space, make a different move";
                 }
             }
-            return "game over, start a new game!"
+            return "Click start to start a new game!"
         }
-        const checkGrid = (player) => {
+        const checkGrid = (player, name) => {
             if (turnCount == 9) {
                 playing = false;
                 win = 0;
                 return "tie!";
             }
             let mark = "";
-            let nextTurn = 0;
             if (player == 1) {
                 mark = "X";
-                nextTurn = 2;
             } else {
                 mark = "O";
-                nextTurn = 1;
             }
             if (grid[1][1] == mark) {
                 // check in order, diag, anti diag, row, col
@@ -91,9 +96,9 @@ game = (() => {
             }
             if (win > 0) {
                 playing = false;
-                return "player " + player + " won!"
+                return name + " won!"
             }
-            return "player" + nextTurn + "'s turn";
+            return "";
         }
         const reset = () => {
             for (let i = 0; i < grid.length; i++) {
@@ -105,15 +110,17 @@ game = (() => {
             turnCount = 0;
             playing = true;
             win = 0;
+            document.getElementById("title").textContent = player1.getName() + "'s turn";
         }
-        return { getGrid, markGrid, reset };
+        return { getGrid, markGrid, reset, setPlaying };
     })();
     const reset = () => {
         board.reset();
-        player1.setName("default1");
-        player2.setName("default2");
+        player1.setName("player1");
+        player2.setName("player2");
         player1.setColor("red");
         player2.setColor("blue");
+
     }
     const getPlayer1 = () => player1;
     const getPlayer2 = () => player2;
@@ -125,7 +132,7 @@ game = (() => {
 display = (() => {
     const init = () => {
         grid = document.getElementById("grid");
-        grid.innerHTML = '';
+        grid.innerHTML = "";
         let xCount = 0;
         let yCount = 0;
         let title = ["T", "I", "C", "T", "A", "C", "T", "O", "E"];
@@ -138,7 +145,7 @@ display = (() => {
             let x = xCount;
             let y = yCount;
             box.addEventListener('click', () => {
-                game.getBoard().markGrid(x, y);
+                document.getElementById("warning").textContent = game.getBoard().markGrid(x, y);
             });
             xCount++;
             if (xCount > 2) {
@@ -148,7 +155,7 @@ display = (() => {
             box.textContent = title[i - 1];
             grid.appendChild(box);
         }
-
+        document.getElementById("title").textContent = "Tic Tac Toe!"
     }
     const clear = () => {
         set = document.getElementsByClassName("box");
@@ -156,8 +163,16 @@ display = (() => {
             box.textContent = "";
         }
         game.reset();
+        document.getElementById("warning").textContent = "";
     }
     return { init, clear }
 })();
-document.getElementById("start").addEventListener('click', () => { display.clear(); });
+document.getElementById("start").addEventListener('click', () => {
+    display.clear();
+});
+document.getElementById("new-players").addEventListener('click', () => {
+    display.init();
+    game.getBoard().setPlaying();
+});
 display.init(true);
+// Todo: add name change features
