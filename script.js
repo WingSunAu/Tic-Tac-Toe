@@ -8,10 +8,16 @@ function createPlayer(name, color, order) {
     const getColor = () => color;
     const getOrder = () => order;
     const getScore = () => score;
-    const setName = (name) => this.name = name;
-    const setColor = (color) => this.color = color;
+    let setName = (newName) => this.name = newName;
+    let setColor = (color) => this.color = color;
     const upScore = () => score++;
-    return { getName, getColor, getOrder, getScore, upScore, setName, setColor };
+    return {
+        getName, getColor, getOrder, getScore, upScore, set setName(newName) {
+            if (newName != "") {
+                name = newName;
+            }
+        }, setColor
+    };
 }
 
 game = (() => {
@@ -62,11 +68,6 @@ game = (() => {
             return "Click start to start a new game!"
         }
         const checkGrid = (player, name) => {
-            if (turnCount == 9) {
-                playing = false;
-                win = 0;
-                return "tie!";
-            }
             let mark = "";
             if (player == 1) {
                 mark = "X";
@@ -97,6 +98,10 @@ game = (() => {
             if (win > 0) {
                 playing = false;
                 return name + " won!"
+            } else if (turnCount == 9) {
+                playing = false;
+                win = 0;
+                return "tie!";
             }
             return "";
         }
@@ -110,17 +115,15 @@ game = (() => {
             turnCount = 0;
             playing = true;
             win = 0;
-            document.getElementById("title").textContent = player1.getName() + "'s turn";
         }
         return { getGrid, markGrid, reset, setPlaying };
     })();
     const reset = () => {
         board.reset();
-        player1.setName("player1");
-        player2.setName("player2");
+        player1.setName = "player1";
+        player2.setName = "player2";
         player1.setColor("red");
         player2.setColor("blue");
-
     }
     const getPlayer1 = () => player1;
     const getPlayer2 = () => player2;
@@ -169,6 +172,9 @@ display = (() => {
 })();
 document.getElementById("start").addEventListener('click', () => {
     display.clear();
+    game.getPlayer1().setName = document.getElementById("p1").value;
+    game.getPlayer2().setName = document.getElementById("p2").value;
+    document.getElementById("title").textContent = game.getPlayer1().getName() + "'s turn";
 });
 document.getElementById("new-players").addEventListener('click', () => {
     display.init();
