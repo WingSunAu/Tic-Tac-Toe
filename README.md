@@ -2,7 +2,7 @@
 
 Local multiplayer Tic-Tac-Toe game <br>
 <a href= "https://wingsunau.github.io/Tic-Tac-Toe/"> Try Here </a>
-
+![alt text](https://github.com/WingSunAU/Tic-Tac-Toe/blob/main/Tic-Tac-Toe.png?raw=true)
 ## Usage
 * enter player names for each symbol
 * Click start to reset the game
